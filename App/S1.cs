@@ -1,4 +1,4 @@
-﻿public class Day1 {
+﻿public class S1 {
 	public static void RunSolution(string fileNumber){
 		var stringArray = File.ReadAllLines($@"B:\Projects\AdventOfCode2023\Inputs\{fileNumber}.txt");
 		var twinNumberList = new List<int>();
@@ -24,6 +24,6 @@
 			twinNumberList.Add(twinNumber);
 		}
 		var result = twinNumberList.Sum();
-		Console.WriteLine("Day 1: " + result);
+		Console.WriteLine("S1: " + result);
 	}
 }
