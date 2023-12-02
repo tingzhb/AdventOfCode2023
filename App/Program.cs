@@ -1,0 +1,1 @@
+﻿Day1.RunSolution("01");
