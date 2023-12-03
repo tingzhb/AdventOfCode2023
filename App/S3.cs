@@ -5,7 +5,7 @@ public class S3{
 		var stringArray = File.ReadAllLines($@"B:\Projects\AdventOfCode2023\Inputs\{fileNumber}.txt");
 		var locationDictionary = new Dictionary<Vector2, char>();
 		var symbolsArray = new[] {'*', '%', '&', '@', '+', '#', '/', '$', '=', '-'};
-		var potentialPartLocations = new Dictionary<int, List<Vector2>>();
+		var potentialPartLocations = new Dictionary<int, List<Vector3>>();
 		var partLocations = new Dictionary<Vector2, int>();
 		var foundParts = new List<int>();
 
@@ -25,7 +25,7 @@ public class S3{
 			if (symbolsArray.Contains(value)){
 				var x = location.X;
 				var y = location.Y;
-				var suspectedParts = new List<Vector2>();
+				var suspectedParts = new List<Vector3>();
 
 				for (var i = -1; i < 2; i++){
 					for (var j = -1; j < 2; j++){
@@ -33,8 +33,12 @@ public class S3{
 							continue;
 						var xCoord = x + i;
 						var yCord = y + j;
+						var zCord = 0;
+						if (value == '*'){
+							zCord = 1;
+						}
 						if (xCoord >= 0 && yCord >= 0 ){
-							suspectedParts.Add(new Vector2(xCoord, yCord));
+							suspectedParts.Add(new Vector3(xCoord, yCord, zCord));
 						}
 					}
 				}
@@ -75,12 +79,29 @@ public class S3{
 		
 		foreach (var instance in potentialPartLocations){
 			var valueList = new List<int>();
+			var multiplicationList = new List<int>();
 			foreach (var location in instance.Value){
-				if (partLocations.TryGetValue(location, out var value)){
-					valueList.Add(value);
+				if (partLocations.TryGetValue(new Vector2(location.X, location.Y), out var value)){
+					if (location.Z > 0){
+						multiplicationList.Add(value);
+					}
+					else {
+						// valueList.Add(value);
+					}
 				}
 			}
+			
 			valueList = valueList.Distinct().ToList();
+			multiplicationList = multiplicationList.Distinct().ToList();
+			
+			if (multiplicationList.Count > 1){
+				var number = 1;
+				foreach (var integer in multiplicationList){
+					number *= integer;
+				}
+				valueList.Add(number);
+			}
+			
 			foundParts.AddRange(valueList);
 		}
 		foreach (var item in foundParts){
