@@ -1,11 +1,14 @@
-﻿public class S6 {
+﻿using System.Numerics;
+
+public class S6 {
 	public static void RunSolution(string fileNumber){
 		var stringArray = File.ReadAllLines($"B:\\Projects\\AdventOfCode2023\\Inputs\\{fileNumber}.txt");
-		var timesDistance = new List<int>();
+		var timesDistance = new List<BigInteger>();
 		var raceInstances = 0;
 		var result = 1;
 		
 		GetEntries(stringArray, timesDistance);
+		
 		raceInstances = timesDistance.Count/2;
 
 		
@@ -17,7 +20,7 @@
 		Console.WriteLine("S6: "+ result);
 	}
 
-	static int GetBeatTimes(int availableTime, int recordDistance){
+	static int GetBeatTimes(BigInteger availableTime, BigInteger recordDistance){
 		var beatTimes = 0;
 		for (var time = 0; time <= availableTime; time++){
 			var distance = time * (availableTime - time);
@@ -43,17 +46,20 @@
 		return new Tuple<float, float>(root1, root2);
 	} 
 	
-	static void GetEntries(string[] stringArray, List<int> timesDistance){
+	static void GetEntries(string[] stringArray, List<BigInteger> timesDistance){
 		foreach (var entry in stringArray){
 			var lines = entry.Split(":");
 			for (var j = 1; j < lines.Length; j++){
 				var data = lines[j].Split(" ");
+				var jointString = "";
 				foreach (var number in data){
 					int.TryParse(number, out var integer);
 					if (integer > 0){
-						timesDistance.Add(integer);
+						jointString += number;
 					}
 				}
+				BigInteger.TryParse(jointString, out var bigNum);
+				timesDistance.Add(bigNum);
 			}
 		}
 	}
