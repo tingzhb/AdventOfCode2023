@@ -3,7 +3,7 @@
 public class S5 {
 	public static void RunSolution(string fileNumber){
 		var stringArray = File.ReadAllLines($"B:\\Projects\\AdventOfCode2023\\Inputs\\{fileNumber}.txt");
-		var seedList = new List<BigInteger>();
+		var seedList = new List<Tuple<BigInteger, BigInteger>>();
 		var sectionList = new List<BigInteger>();
 		var mapList = new List<List<BigInteger>>();
 		var seedToSoilList = new List<BigInteger>();
@@ -36,30 +36,52 @@ public class S5 {
 		Console.WriteLine("S5: "+ resultList.Min());
 	}
 
-	static void FindLocation(List<List<BigInteger>> mapList, List<BigInteger> seedList, List<BigInteger> resultList){
-		foreach (var seed in seedList){
-			BigInteger result = 0;
-			if (seed == 0){
-				break;
-			}
-			foreach (var map in mapList){
-				if (result == 0){
-					result = seed;
-				}
-				for (var i = 0; i < map.Count; i += 3){
-					var affectedLines = map[i + 2];
-					var destinationStart = map[i];
-					var sourceStart = map[i + 1];
-					var sourceEnd = sourceStart + affectedLines;
+	static void FindLocation(List<List<BigInteger>> mapList, List<Tuple<BigInteger, BigInteger>> seedList, List<BigInteger> resultList){
+		var seedFound = false;
 
-					if (result >= sourceStart && result <= sourceEnd){
-						var resultDelta = result - sourceStart;
-						result = resultDelta + destinationStart;
-						break;
+		BigInteger locationNumber = 0;
+
+		while (resultList.Count <= 25){				
+			var previousSeed = locationNumber;
+			
+			for (var i = mapList.Count - 1; i >= 0; i--){
+				var map = mapList[i];
+				for (var j = 0; j < map.Count; j += 3){
+					var affectedLines = map[j + 2] - 1;
+					var destinationStart = map[j];
+					var destinationEnd = map[j] + affectedLines;
+					var sourceStart = map[j + 1];
+					var sourceEnd = sourceStart + affectedLines;
+					if (previousSeed >= destinationStart && previousSeed <= destinationEnd){
+						var resultDelta = previousSeed - destinationStart;
+						previousSeed = sourceStart + resultDelta;
+					}
+				}
+				foreach (var seed in seedList){
+					if (seed.Item1 <= previousSeed && seed.Item2 >= previousSeed){
+						BigInteger result = 0;
+
+						foreach (var map2 in mapList){
+							if (result == 0){
+								result = previousSeed;
+							}
+							for (var k = 0; k < map2.Count; k += 3){
+								var affectedLines = map2[k + 2] - 1;
+								var destinationStart = map2[k];
+								var sourceStart = map2[k + 1];
+								var sourceEnd = sourceStart + affectedLines;
+								if (result >= sourceStart && result <= sourceEnd){
+									var resultDelta = result - sourceStart;
+									result = resultDelta + destinationStart;
+								}
+							}
+						}
+						resultList.Add(locationNumber);
 					}
 				}
 			}
-			resultList.Add(result);
+			
+			locationNumber++;
 		}
 	}
 
@@ -107,27 +129,25 @@ public class S5 {
 			}
 		}
 	}
-	static void FindSeeds(string[] stringArray, List<BigInteger> seedList){
-		var seedLine = stringArray[0].Split(" ");
-		for (var i = 1; i < seedLine.Length; i++){
-			BigInteger.TryParse(seedLine[i], out var seedNumber);
-			seedList.Add(seedNumber);
-		}
-	}
-	
 	// static void FindSeeds(string[] stringArray, List<BigInteger> seedList){
-	// 	var seedDetailsList = new List<BigInteger>();
 	// 	var seedLine = stringArray[0].Split(" ");
 	// 	for (var i = 1; i < seedLine.Length; i++){
-	// 		BigInteger.TryParse(seedLine[i], out var seedDetails);
-	// 		seedDetailsList.Add(seedDetails);
-	// 	}
-	// 	for (var i = 0; i < seedDetailsList.Count; i += 2){
-	// 		var seedStart = seedDetailsList[i];
-	// 		var seedEnd = seedDetailsList[i + 1] + seedStart;
-	// 		for (var j = seedStart; j <= seedEnd; j++){
-	// 			seedList.Add(j);
-	// 		}
+	// 		BigInteger.TryParse(seedLine[i], out var seedNumber);
+	// 		seedList.Add(seedNumber);
 	// 	}
 	// }
+	
+	static void FindSeeds(string[] stringArray, List<Tuple<BigInteger, BigInteger>> seedList){
+		var seedDetailsList = new List<BigInteger>();
+		var seedLine = stringArray[0].Split(" ");
+		for (var i = 1; i < seedLine.Length; i++){
+			BigInteger.TryParse(seedLine[i], out var seedDetails);
+			seedDetailsList.Add(seedDetails);
+		}
+		for (var i = 0; i < seedDetailsList.Count; i += 2){
+			var seedStart = seedDetailsList[i];
+			var seedEnd = seedDetailsList[i + 1] + seedStart - 1;
+			seedList.Add(new Tuple<BigInteger, BigInteger>(seedStart, seedEnd));
+		}
+	}
 }
