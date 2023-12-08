@@ -2,7 +2,9 @@
 
 public class S7 {
 	public static void RunSolution(string fileNumber){
-		var stringArray = File.ReadAllLines($"B:\\Projects\\AdventOfCode2023\\Inputs\\{fileNumber}.txt");
+		// var stringArray = File.ReadAllLines($"B:\\Projects\\AdventOfCode2023\\Inputs\\{fileNumber}.txt");
+		var stringArray = File.ReadAllLines($"/Users/ben/Projects/AdventOfCode2023/Inputs/{fileNumber}.txt");
+
 		var cardList = new List<Card>();
 		var scoreList = new List<int>();
 
@@ -29,6 +31,7 @@ public class S7 {
 		}
 		foreach (var card in cardList){
 			card.Suit = EvaluateCards(card);
+			Console.WriteLine("Suit: " + card.Suit + " Bet: " + card.Bet);
 		}
 		var orderedList = cardList.OrderByDescending(x => (int) x.Suit).ToList();
 		
@@ -73,6 +76,8 @@ public class S7 {
 	static Suits EvaluateCards(Card card){
 		var matchingList = new SortedList<int, int>();
 		var cleanedList = new SortedList<int, int>();
+		var jokers = 0;
+
 		foreach (var cardValue in card.Values){
 			if (matchingList.ContainsKey(cardValue)){
 				matchingList[cardValue]++;
@@ -80,30 +85,33 @@ public class S7 {
 				matchingList.Add(cardValue, 1);
 			}
 		}
-		foreach (var match in matchingList){
-			if (match.Value >= 1){
+		foreach (var match in matchingList) {
+			if (match.Value > 1 && match.Key != 1){
 				cleanedList.Add(match.Key, match.Value);
+			}
+			if (match.Key == 1){
+				jokers += match.Value;
 			}
 		}
 		var matches = cleanedList.Count;
-		
-		cleanedList.TryGetValue(1, out var jokers);
-		Console.WriteLine(jokers);
-		
-		if (matches == 0){
+		if (matches == 0 && jokers < 2){
 			return Suits.None;
 		}
-
-		if (matches == 1){
-			return cleanedList.GetValueAtIndex(0) + jokers switch{
+		if (matches == 1 || jokers > 1){
+			var suits = 0;
+			if (matches == 1){
+				suits = cleanedList.GetValueAtIndex(0);
+			}
+			return (suits + jokers) switch {
 				2 => Suits.One,
 				3 => Suits.Three,
 				4 => Suits.Four,
 				5 => Suits.Five,
+				_ => throw new ArgumentOutOfRangeException()
 			};
 		}
 		if (matches == 2){
-			if (cleanedList.GetValueAtIndex(0) ==  cleanedList.GetValueAtIndex(1)){
+			if (cleanedList.GetValueAtIndex(0) + jokers ==  cleanedList.GetValueAtIndex(1)){
 				return Suits.Two;
 			}
 			return Suits.Full;
