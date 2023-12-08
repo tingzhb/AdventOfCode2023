@@ -86,6 +86,7 @@ public class S7 {
 			}
 		}
 		var matches = cleanedList.Count;
+		
 		cleanedList.TryGetValue(1, out var jokers);
 		Console.WriteLine(jokers);
 		
@@ -94,7 +95,7 @@ public class S7 {
 		}
 
 		if (matches == 1){
-			return cleanedList.GetValueAtIndex(0) switch{
+			return cleanedList.GetValueAtIndex(0) + jokers switch{
 				2 => Suits.One,
 				3 => Suits.Three,
 				4 => Suits.Four,
