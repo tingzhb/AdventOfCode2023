@@ -7,30 +7,50 @@ public class S8 {
 		var lineArray = File.ReadAllLines($"/Users/ben/Projects/AdventOfCode2023/Inputs/{fileNumber}.txt");
 		var directions = lineArray[0].ToCharArray();
 		var nodes = new SortedList<string, Tuple<string, string>>();
-		var steps = 0;
-		var currentNode = "AAA";
-		
+		var startNodes = new SortedList<string, bool>();
+		var lcm = new SortedList<string, int>();
+
 		AddNodes(lineArray, nodes);
 
-		while (currentNode != "ZZZ"){
-			foreach (var direction in directions){
-				currentNode = FindNextNode(currentNode, nodes, direction);
-				steps++;
+		foreach (var node in nodes.Where(node => EndsWith(node.Key) == "A")){
+			startNodes.Add(node.Key, false);
+		}
+		var nodeList = startNodes;
+		var currentStep = 0;
+
+		while (nodeList.ContainsValue(false)){
+			var newNodeList = new SortedList<string, bool>();
+			
+			foreach (var node in nodeList){
+				var nextNode = node.Key;
+				nodes.TryGetValue(nextNode, out var nextNodes);
+				nextNode = directions[currentStep % directions.Length] == 'L' ? nextNodes.Item1 : nextNodes.Item2;
+				
+				if (EndsWith(nextNode) == "Z"){
+					newNodeList.Add(nextNode, true);
+					lcm.TryAdd(nextNode, currentStep + 1);
+				} else {
+					newNodeList.Add(nextNode, false);
+				}
+			}
+			nodeList = newNodeList;
+			currentStep++;
+			if (lcm.Count >= startNodes.Count){
+				foreach (var value in lcm){
+					Console.WriteLine(value.Value);
+				}
+				break;
 			}
 		}
-
-		Console.WriteLine(steps);
+		Console.WriteLine(currentStep);
 	}
 
-	static string FindNextNode(string currentNode, SortedList<string, Tuple<string, string>> nodes, char direction){
-		nodes.TryGetValue(currentNode, out var nextOptions);
-		if (direction == 'L'){
-			return nextOptions.Item1;
-		}
-		return nextOptions.Item2;
+	static string EndsWith(string input){
+		var characters = input.ToCharArray();
+		return characters[^1].ToString();
 	}
+	
 	static void AddNodes(string[] lineArray, SortedList<string, Tuple<string, string>> nodes){
-
 		for (var i = 2; i < lineArray.Length; i++){
 			var strings = lineArray[i].Split(" ");
 			nodes.Add(strings[0], new Tuple<string, string>(SanitizeString(strings[2]), SanitizeString(strings[3])));
