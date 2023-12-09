@@ -8,6 +8,7 @@ public class S9 {
 		var dataLines = new List<List<int>>();
 
 		var totalDifference = 0;
+		var earlySum = 0;
 		
 		foreach (var line in lineArray){
 			var lineStrings = line.Split(" ");
@@ -41,15 +42,26 @@ public class S9 {
 				if (line.Distinct().Count() <= 1){
 					done = true;
 				}
-				
 				sampleLine = line;
 			}
+
+			var delta = lines[^1][0];
+
+			for (var i = lines.Count - 2; i >= 0; i--){
+				delta = lines[i][0] - delta;
+			}
+			earlySum += delta;
+			
+				
 			foreach (var line in lines){
 				lastNumbers.Add(line[^1]);
 			}
+			
 			var finalDifference = lastNumbers.Sum();
 			totalDifference += finalDifference;
 		}
-		Console.WriteLine(totalDifference);
+		Console.WriteLine("09: " + totalDifference);
+		Console.WriteLine("09A: " + earlySum);
+		// 10317 X
 	}
 }
