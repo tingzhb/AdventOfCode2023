@@ -6,5 +6,7 @@
 // S6.RunSolution("06");
 // S7.RunSolution("07");
 // S8.RunSolution("08");
-S9.RunSolution("09");
+// S9.RunSolution("09");
+S10.RunSolution("10");
+
 
